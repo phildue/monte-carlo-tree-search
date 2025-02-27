@@ -1,4 +1,4 @@
-#include "tic_tac_toe.h"
+#include "TicTacToe.h"
 #include <vector>
 #include <sstream>
 #include <algorithm>
@@ -20,6 +20,7 @@ void TicTacToe::act(int index, char player) {
         throw std::runtime_error("Invalid move.");
     }
     _board[index] = player;
+    switchTurn();
 }
 
 bool TicTacToe::isWin(char player) const {
@@ -52,6 +53,7 @@ bool TicTacToe::checkDiagonals(char player) const {
 std::vector<int> TicTacToe::possibleActions() const
 {
     std::vector<int> result;
+    result.reserve(9);
     for (int i = 0; i < 9; ++i) {
         if (_board[i] == ' ') {
             result.push_back(i);

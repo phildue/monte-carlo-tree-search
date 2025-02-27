@@ -1,7 +1,8 @@
 #pragma once
 #include <iostream>
 #include <memory>
-#include "tic_tac_toe.h"
+#include "TicTacToe.h"
+#include "MonteCarloTreeSearch.h"
 
 class Player {
     public:
@@ -34,4 +35,17 @@ class RandomPlayer : public Player {
             auto actions = game->possibleActions();
             return actions[rand() % actions.size()];
         }
+};
+
+class AIPlayer : public Player {
+    public:
+    AIPlayer(char player, MonteCarloTreeSearch::ShConstPtr mcts) : Player(player),_mcts{mcts} {}
+    int getMove(TicTacToe::ShConstPtr game) override{
+        auto move = _mcts->findNextMove(game);
+        std::cout << "[" << player() << "] AI move: " << move << std::endl;
+        return move;
+    }
+    private:
+    MonteCarloTreeSearch::ShConstPtr _mcts;
+    
 };

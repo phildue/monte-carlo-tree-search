@@ -1,0 +1,41 @@
+# CMake generated files
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+
+# Build directories
+/build/
+/out/
+/bin/
+/lib/
+/obj/
+
+# IDE specific files
+.idea
+.vscode
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Compiled source files
+*.o
+*.so
+*.a
+*.dylib
+*.dll
+*.exe
+
+# Logs and databases
+*.log
+*.sql
+*.sqlite
+
+# Temporary files
+*.tmp
+*.swp
+*.bak
+*.old
+*.pid
+*.seed
