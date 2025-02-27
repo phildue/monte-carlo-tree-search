@@ -1,37 +1,42 @@
 #pragma once
 
+#include <math.h>
+
 #include <memory>
 #include <vector>
-#include <math.h>
+
 #include "TicTacToe.h"
-#include "Node.h"
+#include "TreeNode.h"
 class MonteCarloTreeSearch {
-public:
-    using ShPtr = std::shared_ptr<MonteCarloTreeSearch>;
-    using ShConstPtr = std::shared_ptr<const MonteCarloTreeSearch>;
+ public:
+  typedef std::shared_ptr<MonteCarloTreeSearch> ShPtr;
+  typedef std::shared_ptr<const MonteCarloTreeSearch> ShConstPtr;
 
-    struct Meta{
-        int action;
-        TicTacToe::ShPtr game;
-        int nVisits = 0;
-        double totalReward = 0;
-        float ucb1 = std::numeric_limits<float>::max();
-    };
-    
+  struct Meta {
+    int action;
+    TicTacToe::ShPtr game;
+    int nVisits = 0;
+    double totalReward = 0;
+    float ucb1 = std::numeric_limits<float>::max();
+  };
+  typedef TreeNode<Meta> Node;
 
-    MonteCarloTreeSearch(char player, int maxIterations, float ucbConstant = std::sqrt(2)):_player{player},_maxIterations{maxIterations},_ucbConstant{ucbConstant}{};
-    ~MonteCarloTreeSearch() = default;
+  MonteCarloTreeSearch(char player, int maxIterations,
+                       float ucbConstant = std::sqrt(2))
+      : _player{player},
+        _maxIterations{maxIterations},
+        _ucbConstant{ucbConstant} {};
+  ~MonteCarloTreeSearch() = default;
 
-    int findNextMove(TicTacToe::ShConstPtr game) const;
-    Node<Meta>::ShPtr select(Node<Meta>::ShPtr node) const;
-    Node<Meta>::ShPtr expand(Node<Meta>::ShPtr node) const;
-    float simulate(Node<Meta>::ShConstPtr node) const;
-    void backpropagate(Node<Meta>::ShPtr node, int result) const;
-    float ucb1(Node<MonteCarloTreeSearch::Meta>::ShConstPtr node) const;
-private:
-    char _player;
-    int _maxIterations;
-    float _ucbConstant;
+  int findNextMove(TicTacToe::ShConstPtr game) const;
+  Node::ShPtr select(Node::ShPtr node) const;
+  Node::ShPtr expand(Node::ShPtr node) const;
+  float simulate(Node::ShConstPtr node) const;
+  void backpropagate(Node::ShPtr node, int result) const;
+  float ucb1(Node::ShConstPtr node) const;
+
+ private:
+  char _player;
+  int _maxIterations;
+  float _ucbConstant;
 };
-
-
