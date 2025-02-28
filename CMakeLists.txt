@@ -6,4 +6,4 @@ project(monte_carlo_tree_search)
 set(CMAKE_CXX_STANDARD 20)
 
 include_directories(src)
-add_executable(${PROJECT_NAME} src/main.cpp src/TicTacToe.cpp )
+add_executable(tic_tac_toe src/main_tic_tac_toe.cpp src/TicTacToe.cpp )
