@@ -8,7 +8,7 @@
 #include "Game.h"
 #include "MonteCarloTreeSearch.h"
 
-template <game::Game Game>
+template <IsGame Game>
 std::string reward2str(
     typename MonteCarloTreeSearch<Game>::Node::ShConstPtr node) {
   std::stringstream ss;
@@ -29,7 +29,7 @@ std::string reward2str(
   return ss.str();
 }
 
-template <game::Game Game>
+template <IsGame Game>
 typename Game::Action MonteCarloTreeSearch<Game>::findNextMove(
     const Game& game) const {
   auto root = std::make_shared<Node>(Meta{typename Game::Action(), game, 0, 0});
@@ -50,7 +50,7 @@ typename Game::Action MonteCarloTreeSearch<Game>::findNextMove(
       .action;
 }
 
-template <game::Game Game>
+template <IsGame Game>
 typename MonteCarloTreeSearch<Game>::Node::ShPtr
 MonteCarloTreeSearch<Game>::select(
     typename MonteCarloTreeSearch<Game>::Node::ShPtr tree) const {
@@ -72,7 +72,7 @@ MonteCarloTreeSearch<Game>::select(
   return node;
 }
 
-template <game::Game Game>
+template <IsGame Game>
 typename MonteCarloTreeSearch<Game>::Node::ShPtr
 MonteCarloTreeSearch<Game>::expand(
     typename MonteCarloTreeSearch<Game>::Node::ShPtr tree) const {
@@ -89,7 +89,7 @@ MonteCarloTreeSearch<Game>::expand(
   return tree->children()[rand() % actions.size()];
 }
 
-template <game::Game Game>
+template <IsGame Game>
 float MonteCarloTreeSearch<Game>::simulate(
     typename MonteCarloTreeSearch<Game>::Node::ShConstPtr node) const {
   auto game = node->data().game;
@@ -106,7 +106,7 @@ float MonteCarloTreeSearch<Game>::simulate(
   return 0;
 }
 
-template <game::Game Game>
+template <IsGame Game>
 void MonteCarloTreeSearch<Game>::backpropagate(
     typename MonteCarloTreeSearch<Game>::Node::ShPtr node, int result) const {
   auto n = node;
@@ -117,7 +117,7 @@ void MonteCarloTreeSearch<Game>::backpropagate(
   } while (n);
 }
 
-template <game::Game Game>
+template <IsGame Game>
 float MonteCarloTreeSearch<Game>::ucb1(
     typename MonteCarloTreeSearch<Game>::Node::ShConstPtr node) const {
   const auto& data = node->data();

@@ -8,7 +8,7 @@
 #include "MonteCarloTreeSearch.h"
 #include "TicTacToe.h"
 
-template <game::Game Game>
+template <IsGame Game>
 class Player {
  public:
   typedef std::shared_ptr<Player> ShPtr;
@@ -18,7 +18,7 @@ class Player {
   virtual std::string player() const = 0;
 };
 
-template <game::Game Game>
+template <IsGame Game>
 class HumanPlayer : public Player<Game> {
  public:
   HumanPlayer(const std::string& player) : _player(player) {}
@@ -34,7 +34,7 @@ class HumanPlayer : public Player<Game> {
   std::string _player;
 };
 
-template <game::Game Game>
+template <IsGame Game>
 class AIPlayer : public Player<Game> {
  public:
   AIPlayer(const std::string& player,
@@ -52,7 +52,7 @@ class AIPlayer : public Player<Game> {
   std::shared_ptr<const MonteCarloTreeSearch<Game>> _mcts;
 };
 
-template <game::Game Game>
+template <IsGame Game>
 class RandomPlayer : public Player<Game> {
  public:
   RandomPlayer(const std::string& player) : _player(player) {}

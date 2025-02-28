@@ -9,15 +9,15 @@
 #include "Game.h"
 #include "TreeNode.h"
 
-template <game::Game G>
+template <IsGame Game>
 class MonteCarloTreeSearch {
  public:
   typedef std::shared_ptr<MonteCarloTreeSearch> ShPtr;
   typedef std::shared_ptr<const MonteCarloTreeSearch> ShConstPtr;
 
   struct Meta {
-    G::Action action;
-    G game;
+    Game::Action action;
+    Game game;
     int nVisits = 0;
     double totalReward = 0;
     float ucb1 = std::numeric_limits<float>::max();
@@ -31,7 +31,7 @@ class MonteCarloTreeSearch {
         _ucbConstant{ucbConstant} {};
   ~MonteCarloTreeSearch() = default;
 
-  G::Action findNextMove(const G& game) const;
+  Game::Action findNextMove(const Game& game) const;
   typename Node::ShPtr select(typename Node::ShPtr node) const;
   typename Node::ShPtr expand(typename Node::ShPtr node) const;
   float simulate(typename Node::ShConstPtr node) const;
