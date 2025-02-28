@@ -8,24 +8,22 @@
 #include "MonteCarloTreeSearch.h"
 #include "TicTacToe.h"
 
-template <typename G, typename Action>
-  requires Game<G, Action>
+template <game::Game Game>
 class Player {
  public:
   typedef std::shared_ptr<Player> ShPtr;
   typedef std::shared_ptr<const Player> ShConstPtr;
   virtual ~Player() = default;
-  virtual Action getMove(const G& game) const = 0;
+  virtual Game::Action getAction(const Game& game) const = 0;
   virtual std::string player() const = 0;
 };
 
-template <typename G, typename Action>
-  requires Game<G, Action>
-class HumanPlayer : public Player<G, Action> {
+template <game::Game Game>
+class HumanPlayer : public Player<Game> {
  public:
   HumanPlayer(const std::string& player) : _player(player) {}
-  Action getMove(const G& game) const override {
-    Action index;
+  Game::Action getAction(const Game& game) const override {
+    typename Game::Action index;
     std::cout << "[" << _player << "] Enter index: ";
     std::cin >> index;
     return index;
@@ -36,14 +34,13 @@ class HumanPlayer : public Player<G, Action> {
   std::string _player;
 };
 
-template <typename G, typename Action>
-  requires Game<G, Action>
-class AIPlayer : public Player<G, Action> {
+template <game::Game Game>
+class AIPlayer : public Player<Game> {
  public:
   AIPlayer(const std::string& player,
-           std::shared_ptr<const MonteCarloTreeSearch<G, Action>> mcts)
+           std::shared_ptr<const MonteCarloTreeSearch<Game>> mcts)
       : _player(player), _mcts(mcts) {}
-  Action getMove(const G& game) const override {
+  Game::Action getAction(const Game& game) const override {
     auto move = _mcts->findNextMove(game);
     std::cout << "[" << _player << "] AI move: " << move << std::endl;
     return move;
@@ -52,15 +49,14 @@ class AIPlayer : public Player<G, Action> {
 
  private:
   std::string _player;
-  std::shared_ptr<const MonteCarloTreeSearch<G, Action>> _mcts;
+  std::shared_ptr<const MonteCarloTreeSearch<Game>> _mcts;
 };
 
-template <typename G, typename Action>
-  requires Game<G, Action>
-class RandomPlayer : public Player<G, Action> {
+template <game::Game Game>
+class RandomPlayer : public Player<Game> {
  public:
   RandomPlayer(const std::string& player) : _player(player) {}
-  Action getMove(const G& game) const override {
+  Game::Action getAction(const Game& game) const override {
     auto actions = game.possibleActions();
     return actions[rand() % actions.size()];
   }

@@ -7,22 +7,20 @@
 int main() {
   TicTacToe game{};
   std::cout << "Tic Tac Toe Game" << std::endl;
-  std::map<std::string, Player<TicTacToe, TicTacToe::Action>::ShConstPtr>
-      players = {
-          {"O",
-           std::make_shared<HumanPlayer<TicTacToe, TicTacToe::Action>>("O")},
-          {"X",
-           std::make_shared<AIPlayer<TicTacToe, TicTacToe::Action>>(
-               "X", std::make_shared<
-                        MonteCarloTreeSearch<TicTacToe, TicTacToe::Action>>(
-                        "X", 1000))}
+  std::map<std::string, Player<TicTacToe>::ShConstPtr> players = {
+      {"O",
+       std::make_shared<AIPlayer<TicTacToe>>(
+           "O", std::make_shared<MonteCarloTreeSearch<TicTacToe>>("O", 1000))},
+      {"X",
+       std::make_shared<AIPlayer<TicTacToe>>(
+           "X", std::make_shared<MonteCarloTreeSearch<TicTacToe>>("X", 1000))}
 
-      };
+  };
   while (!game.isWin("X") && !game.isWin("O") && !game.isDraw()) {
     std::cout << game.str() << std::endl;
     auto player = players[game.turn()];
     try {
-      game.act(player->getMove(game));
+      game.act(player->getAction(game));
     } catch (std::runtime_error& e) {
       std::cout << e.what() << std::endl;
     }

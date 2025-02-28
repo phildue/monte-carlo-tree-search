@@ -8,10 +8,9 @@
 #include "Game.h"
 #include "MonteCarloTreeSearch.h"
 
-template <typename G, typename Action>
-  requires Game<G, Action>
+template <game::Game Game>
 std::string reward2str(
-    typename MonteCarloTreeSearch<G, Action>::Node::ShConstPtr node) {
+    typename MonteCarloTreeSearch<Game>::Node::ShConstPtr node) {
   std::stringstream ss;
   for (int i = 0; i < 9; ++i) {
     const auto& children = node->children();
@@ -30,17 +29,17 @@ std::string reward2str(
   return ss.str();
 }
 
-template <typename G, typename Action>
-  requires Game<G, Action>
-Action MonteCarloTreeSearch<G, Action>::findNextMove(const G& game) const {
-  auto root = std::make_shared<Node>(Meta{-1, game, 0, 0});
+template <game::Game Game>
+typename Game::Action MonteCarloTreeSearch<Game>::findNextMove(
+    const Game& game) const {
+  auto root = std::make_shared<Node>(Meta{typename Game::Action(), game, 0, 0});
   for (int i = 0; i < _maxIterations; ++i) {
     auto node = select(root);
     node = expand(node);
     auto reward = simulate(node);
     backpropagate(node, reward);
   }
-  std::cout << reward2str<G, Action>(root) << std::endl;
+  std::cout << reward2str<Game>(root) << std::endl;
 
   return (*std::max_element(root->children().begin(), root->children().end(),
                             [](auto a, auto b) {
@@ -51,11 +50,10 @@ Action MonteCarloTreeSearch<G, Action>::findNextMove(const G& game) const {
       .action;
 }
 
-template <typename G, typename Action>
-  requires Game<G, Action>
-typename MonteCarloTreeSearch<G, Action>::Node::ShPtr
-MonteCarloTreeSearch<G, Action>::select(
-    typename MonteCarloTreeSearch<G, Action>::Node::ShPtr tree) const {
+template <game::Game Game>
+typename MonteCarloTreeSearch<Game>::Node::ShPtr
+MonteCarloTreeSearch<Game>::select(
+    typename MonteCarloTreeSearch<Game>::Node::ShPtr tree) const {
   auto node = tree;
   auto game = node->data().game;
   while (!game.isWin("X") && !game.isWin("O") && !game.isDraw()) {
@@ -74,11 +72,10 @@ MonteCarloTreeSearch<G, Action>::select(
   return node;
 }
 
-template <typename G, typename Action>
-  requires Game<G, Action>
-typename MonteCarloTreeSearch<G, Action>::Node::ShPtr
-MonteCarloTreeSearch<G, Action>::expand(
-    typename MonteCarloTreeSearch<G, Action>::Node::ShPtr tree) const {
+template <game::Game Game>
+typename MonteCarloTreeSearch<Game>::Node::ShPtr
+MonteCarloTreeSearch<Game>::expand(
+    typename MonteCarloTreeSearch<Game>::Node::ShPtr tree) const {
   const auto& actions = tree->data().game.possibleActions();
   if (actions.empty()) {
     return tree;
@@ -92,10 +89,9 @@ MonteCarloTreeSearch<G, Action>::expand(
   return tree->children()[rand() % actions.size()];
 }
 
-template <typename G, typename Action>
-  requires Game<G, Action>
-float MonteCarloTreeSearch<G, Action>::simulate(
-    typename MonteCarloTreeSearch<G, Action>::Node::ShConstPtr node) const {
+template <game::Game Game>
+float MonteCarloTreeSearch<Game>::simulate(
+    typename MonteCarloTreeSearch<Game>::Node::ShConstPtr node) const {
   auto game = node->data().game;
   while (!game.isWin("X") && !game.isWin("O") && !game.isDraw()) {
     auto actions = game.possibleActions();
@@ -110,11 +106,9 @@ float MonteCarloTreeSearch<G, Action>::simulate(
   return 0;
 }
 
-template <typename G, typename Action>
-  requires Game<G, Action>
-void MonteCarloTreeSearch<G, Action>::backpropagate(
-    typename MonteCarloTreeSearch<G, Action>::Node::ShPtr node,
-    int result) const {
+template <game::Game Game>
+void MonteCarloTreeSearch<Game>::backpropagate(
+    typename MonteCarloTreeSearch<Game>::Node::ShPtr node, int result) const {
   auto n = node;
   do {
     n->data().nVisits++;
@@ -123,10 +117,9 @@ void MonteCarloTreeSearch<G, Action>::backpropagate(
   } while (n);
 }
 
-template <typename G, typename Action>
-  requires Game<G, Action>
-float MonteCarloTreeSearch<G, Action>::ucb1(
-    typename MonteCarloTreeSearch<G, Action>::Node::ShConstPtr node) const {
+template <game::Game Game>
+float MonteCarloTreeSearch<Game>::ucb1(
+    typename MonteCarloTreeSearch<Game>::Node::ShConstPtr node) const {
   const auto& data = node->data();
   if (data.nVisits == 0) {
     return std::numeric_limits<float>::max();
