@@ -1,12 +1,9 @@
-### code sample 
+### code sample
 # set cmake minimum required version
-cmake_minimum_required(VERSION 3.10.0)
+cmake_minimum_required(VERSION 3.16.0)
 project(monte_carlo_tree_search)
 
-#standard c++ 17
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 
 include_directories(src)
-add_executable(${PROJECT_NAME} src/main.cpp src/TicTacToe.cpp src/MonteCarloTreeSearch.cpp)
-
- 
+add_executable(${PROJECT_NAME} src/main.cpp src/TicTacToe.cpp )

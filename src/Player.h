@@ -1,51 +1,71 @@
 #pragma once
+#include <cstdlib>
 #include <iostream>
 #include <memory>
-#include "TicTacToe.h"
+#include <string>
+#include <vector>
+
 #include "MonteCarloTreeSearch.h"
+#include "TicTacToe.h"
 
+template <typename G, typename Action>
+  requires Game<G, Action>
 class Player {
-    public:
-        using ShPtr = std::shared_ptr<Player>;
-        using UnPtr = std::unique_ptr<Player>;
-        using ShConstPtr = std::shared_ptr<const Player>;
-        Player(char player) : _player{player} {}
-        virtual ~Player() = default;
-        virtual int getMove(TicTacToe::ShConstPtr game) = 0;
-        char player() const { return _player;}
-    private:
-        char _player;
+ public:
+  typedef std::shared_ptr<Player> ShPtr;
+  typedef std::shared_ptr<const Player> ShConstPtr;
+  virtual ~Player() = default;
+  virtual Action getMove(const G& game) const = 0;
+  virtual std::string player() const = 0;
 };
 
-class HumanPlayer : public Player {
-    public:
-        HumanPlayer(char player) : Player(player) {}
-        int getMove(TicTacToe::ShConstPtr game) override {
-            int index;
-            std::cout << "[" << player() << "] Enter index: ";
-            std::cin >> index;
-            return index;
-        }
+template <typename G, typename Action>
+  requires Game<G, Action>
+class HumanPlayer : public Player<G, Action> {
+ public:
+  HumanPlayer(const std::string& player) : _player(player) {}
+  Action getMove(const G& game) const override {
+    Action index;
+    std::cout << "[" << _player << "] Enter index: ";
+    std::cin >> index;
+    return index;
+  }
+  std::string player() const override { return _player; }
+
+ private:
+  std::string _player;
 };
 
-class RandomPlayer : public Player {
-    public:
-        RandomPlayer(char player) : Player(player) {}
-        int getMove(TicTacToe::ShConstPtr game) override {
-            auto actions = game->possibleActions();
-            return actions[rand() % actions.size()];
-        }
+template <typename G, typename Action>
+  requires Game<G, Action>
+class AIPlayer : public Player<G, Action> {
+ public:
+  AIPlayer(const std::string& player,
+           std::shared_ptr<const MonteCarloTreeSearch<G, Action>> mcts)
+      : _player(player), _mcts(mcts) {}
+  Action getMove(const G& game) const override {
+    auto move = _mcts->findNextMove(game);
+    std::cout << "[" << _player << "] AI move: " << move << std::endl;
+    return move;
+  }
+  std::string player() const override { return _player; }
+
+ private:
+  std::string _player;
+  std::shared_ptr<const MonteCarloTreeSearch<G, Action>> _mcts;
 };
 
-class AIPlayer : public Player {
-    public:
-    AIPlayer(char player, MonteCarloTreeSearch::ShConstPtr mcts) : Player(player),_mcts{mcts} {}
-    int getMove(TicTacToe::ShConstPtr game) override{
-        auto move = _mcts->findNextMove(game);
-        std::cout << "[" << player() << "] AI move: " << move << std::endl;
-        return move;
-    }
-    private:
-    MonteCarloTreeSearch::ShConstPtr _mcts;
-    
+template <typename G, typename Action>
+  requires Game<G, Action>
+class RandomPlayer : public Player<G, Action> {
+ public:
+  RandomPlayer(const std::string& player) : _player(player) {}
+  Action getMove(const G& game) const override {
+    auto actions = game.possibleActions();
+    return actions[rand() % actions.size()];
+  }
+  std::string player() const override { return _player; }
+
+ private:
+  std::string _player;
 };
