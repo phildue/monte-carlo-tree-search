@@ -9,51 +9,40 @@
 #include "MonteCarloTreeSearch.h"
 
 template <IsGame Game>
-std::string reward2str(
-    typename MonteCarloTreeSearch<Game>::Node::ShConstPtr node) {
-  std::stringstream ss;
-  for (int i = 0; i < 9; ++i) {
-    const auto& children = node->children();
-    auto action = std::find_if(children.begin(), children.end(),
-                               [i](auto n) { return n->data().action == i; });
-    if (action == children.end()) {
-      ss << ". ";
-    } else {
-      auto data = (*action)->data();
-      ss << data.totalReward << "|" << data.nVisits << " ";
-    }
-    if (i % 3 == 2) {
-      ss << "\n";
-    }
-  }
-  return ss.str();
+Game::Action MonteCarloTreeSearch<Game>::findNextMove(const Game& game) const {
+  auto tree = buildTree(game);
+  return selectBestAction(tree);
 }
 
 template <IsGame Game>
-typename Game::Action MonteCarloTreeSearch<Game>::findNextMove(
+MonteCarloTreeSearch<Game>::Node::ShPtr MonteCarloTreeSearch<Game>::buildTree(
     const Game& game) const {
-  auto root = std::make_shared<Node>(Meta{typename Game::Action(), game, 0, 0});
+  auto tree = std::make_shared<Node>(Meta{typename Game::Action{}, game, 0, 0});
   for (int i = 0; i < _maxIterations; ++i) {
-    auto node = select(root);
+    auto node = select(tree);
     node = expand(node);
     auto reward = simulate(node);
     backpropagate(node, reward);
   }
-  std::cout << reward2str<Game>(root) << std::endl;
+  return tree;
+}
 
-  return (*std::max_element(root->children().begin(), root->children().end(),
+template <IsGame Game>
+Game::Action MonteCarloTreeSearch<Game>::selectBestAction(
+    MonteCarloTreeSearch<Game>::Node::ShConstPtr node) const {
+  auto children = node->children();
+  return (*std::max_element(children.begin(), children.end(),
                             [](auto a, auto b) {
                               return a->data().totalReward / a->data().nVisits <
-                                     b->data().totalReward / b->data().nVisits;
+                                     b->data().totalReward / a->data().nVisits;
                             }))
       ->data()
       .action;
 }
 
 template <IsGame Game>
-typename MonteCarloTreeSearch<Game>::Node::ShPtr
-MonteCarloTreeSearch<Game>::select(
-    typename MonteCarloTreeSearch<Game>::Node::ShPtr tree) const {
+MonteCarloTreeSearch<Game>::Node::ShPtr MonteCarloTreeSearch<Game>::select(
+    MonteCarloTreeSearch<Game>::Node::ShPtr tree) const {
   auto node = tree;
   auto game = node->data().game;
   while (!game.isWin("X") && !game.isWin("O") && !game.isDraw()) {
@@ -73,9 +62,8 @@ MonteCarloTreeSearch<Game>::select(
 }
 
 template <IsGame Game>
-typename MonteCarloTreeSearch<Game>::Node::ShPtr
-MonteCarloTreeSearch<Game>::expand(
-    typename MonteCarloTreeSearch<Game>::Node::ShPtr tree) const {
+MonteCarloTreeSearch<Game>::Node::ShPtr MonteCarloTreeSearch<Game>::expand(
+    MonteCarloTreeSearch<Game>::Node::ShPtr tree) const {
   const auto& actions = tree->data().game.possibleActions();
   if (actions.empty()) {
     return tree;
@@ -91,7 +79,7 @@ MonteCarloTreeSearch<Game>::expand(
 
 template <IsGame Game>
 float MonteCarloTreeSearch<Game>::simulate(
-    typename MonteCarloTreeSearch<Game>::Node::ShConstPtr node) const {
+    MonteCarloTreeSearch<Game>::Node::ShConstPtr node) const {
   auto game = node->data().game;
   while (!game.isWin("X") && !game.isWin("O") && !game.isDraw()) {
     auto actions = game.possibleActions();
@@ -108,7 +96,7 @@ float MonteCarloTreeSearch<Game>::simulate(
 
 template <IsGame Game>
 void MonteCarloTreeSearch<Game>::backpropagate(
-    typename MonteCarloTreeSearch<Game>::Node::ShPtr node, int result) const {
+    MonteCarloTreeSearch<Game>::Node::ShPtr node, int result) const {
   auto n = node;
   do {
     n->data().nVisits++;
@@ -119,7 +107,7 @@ void MonteCarloTreeSearch<Game>::backpropagate(
 
 template <IsGame Game>
 float MonteCarloTreeSearch<Game>::ucb1(
-    typename MonteCarloTreeSearch<Game>::Node::ShConstPtr node) const {
+    MonteCarloTreeSearch<Game>::Node::ShConstPtr node) const {
   const auto& data = node->data();
   if (data.nVisits == 0) {
     return std::numeric_limits<float>::max();
@@ -127,4 +115,25 @@ float MonteCarloTreeSearch<Game>::ucb1(
   return data.totalReward / data.nVisits +
          _ucbConstant *
              std::sqrt(std::log(node->parent()->data().nVisits) / data.nVisits);
+}
+
+template <IsGame Game>
+std::string MonteCarloTreeSearch<Game>::nodeToStr(
+    typename MonteCarloTreeSearch<Game>::Node::ShConstPtr node) const {
+  std::stringstream ss;
+  for (int i = 0; i < 9; ++i) {
+    const auto& children = node->children();
+    auto action = std::find_if(children.begin(), children.end(),
+                               [i](auto n) { return n->data().action == i; });
+    if (action == children.end()) {
+      ss << "...... ";
+    } else {
+      auto data = (*action)->data();
+      ss << data.totalReward << "|" << data.nVisits << " ";
+    }
+    if (i % 3 == 2) {
+      ss << "\n";
+    }
+  }
+  return ss.str();
 }

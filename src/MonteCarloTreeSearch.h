@@ -26,20 +26,24 @@ class MonteCarloTreeSearch {
 
   MonteCarloTreeSearch(std::string player, int maxIterations,
                        float ucbConstant = std::sqrt(2))
-      : _player{std::move(player)},
+      : _player{player},
         _maxIterations{maxIterations},
         _ucbConstant{ucbConstant} {};
   ~MonteCarloTreeSearch() = default;
 
   Game::Action findNextMove(const Game& game) const;
-  typename Node::ShPtr select(typename Node::ShPtr node) const;
-  typename Node::ShPtr expand(typename Node::ShPtr node) const;
-  float simulate(typename Node::ShConstPtr node) const;
-  void backpropagate(typename Node::ShPtr node, int result) const;
-  float ucb1(typename Node::ShConstPtr node) const;
+  Node::ShPtr buildTree(const Game& game) const;
+  Game::Action selectBestAction(Node::ShConstPtr node) const;
+  Node::ShPtr select(Node::ShPtr node) const;
+  Node::ShPtr expand(Node::ShPtr node) const;
+  float simulate(Node::ShConstPtr node) const;
+  void backpropagate(Node::ShPtr node, int result) const;
+  float ucb1(Node::ShConstPtr node) const;
+
+  std::string nodeToStr(Node::ShConstPtr node) const;
 
  private:
-  std::string _player;  // Change the type of _player to std::string
+  std::string _player;
   int _maxIterations;
   float _ucbConstant;
 };
