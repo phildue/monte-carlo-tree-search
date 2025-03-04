@@ -10,11 +10,13 @@
 #include "TicTacToe.h"
 
 std::shared_ptr<Player<TicTacToe>> createPlayer(const std::string& type,
-                                                const std::string& symbol) {
+                                                const std::string& symbol,
+                                                int iterations) {
+  const std::string opponent = symbol == "X" ? "O" : "X";
   if (type == "ai") {
     return std::make_shared<AIPlayer<TicTacToe>>(
-        symbol,
-        std::make_shared<MonteCarloTreeSearch<TicTacToe>>(symbol, 10000));
+        symbol, std::make_shared<MonteCarloTreeSearch<TicTacToe>>(
+                    symbol, opponent, iterations));
   } else if (type == "human") {
     return std::make_shared<HumanPlayer<TicTacToe>>(symbol);
   } else if (type == "random") {
@@ -27,9 +29,10 @@ std::shared_ptr<Player<TicTacToe>> createPlayer(const std::string& type,
 int main(int argc, char* argv[]) {
   std::string playerXType = "ai";
   std::string playerOType = "ai";
+  int iterations = 100000;
 
   int opt;
-  while ((opt = getopt(argc, argv, "X:O:")) != -1) {
+  while ((opt = getopt(argc, argv, "X:O:i:")) != -1) {
     switch (opt) {
       case 'X':
         playerXType = optarg;
@@ -37,9 +40,13 @@ int main(int argc, char* argv[]) {
       case 'O':
         playerOType = optarg;
         break;
+      case 'i':
+        iterations = std::stoi(optarg);
+        break;
       default:
         std::cerr << "Usage: " << argv[0]
-                  << " [-X playerXType] [-O playerOType]" << std::endl;
+                  << " [-X playerXType] [-O playerOType] [-i iterations]"
+                  << std::endl;
         return 1;
     }
   }
@@ -48,8 +55,8 @@ int main(int argc, char* argv[]) {
   std::cout << "Tic Tac Toe Game" << std::endl;
 
   std::map<std::string, Player<TicTacToe>::ShConstPtr> players = {
-      {"O", createPlayer(playerOType, "O")},
-      {"X", createPlayer(playerXType, "X")}};
+      {"O", createPlayer(playerOType, "O", iterations)},
+      {"X", createPlayer(playerXType, "X", iterations)}};
 
   while (!game.isWin("X") && !game.isWin("O") && !game.isDraw()) {
     std::cout << game.str() << std::endl;

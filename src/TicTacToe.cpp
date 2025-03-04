@@ -56,6 +56,10 @@ bool TicTacToe::checkDiagonals(const std::string& player) const {
 }
 
 std::vector<int> TicTacToe::possibleActions() const {
+  if (isWin("X") || isWin("O") || isDraw()) {
+    return {};
+  }
+
   std::vector<int> result;
   result.reserve(9);
   for (int i = 0; i < 9; ++i) {

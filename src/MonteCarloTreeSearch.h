@@ -20,13 +20,14 @@ class MonteCarloTreeSearch {
     Game game;
     int nVisits = 0;
     double totalReward = 0;
-    float ucb1 = std::numeric_limits<float>::max();
+    double score = 0;
   };
   typedef TreeNode<Meta> Node;
 
-  MonteCarloTreeSearch(std::string player, int maxIterations,
-                       float ucbConstant = std::sqrt(2))
+  MonteCarloTreeSearch(const std::string& player, const std::string& opponent,
+                       int maxIterations, float ucbConstant = std::sqrt(2))
       : _player{player},
+        _opponent{opponent},
         _maxIterations{maxIterations},
         _ucbConstant{ucbConstant} {};
   ~MonteCarloTreeSearch() = default;
@@ -37,15 +38,16 @@ class MonteCarloTreeSearch {
   Node::ShPtr select(Node::ShPtr node) const;
   Node::ShPtr expand(Node::ShPtr node) const;
   float simulate(Node::ShConstPtr node) const;
-  void backpropagate(Node::ShPtr node, int result) const;
-  float ucb1(Node::ShConstPtr node) const;
+  void backpropagate(Node::ShPtr node, float result) const;
 
   std::string nodeToStr(Node::ShConstPtr node) const;
+  void drawTree(const std::string& filename,
+                typename Node::ShConstPtr root) const;
 
  private:
-  std::string _player;
+  std::string _player, _opponent;
   int _maxIterations;
-  float _ucbConstant;
+  double _ucbConstant;
 };
 
 #include "MonteCarloTreeSearch.hpp"

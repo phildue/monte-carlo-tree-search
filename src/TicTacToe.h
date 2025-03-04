@@ -21,6 +21,7 @@ class TicTacToe {
   std::string str() const;
   bool isWin(const std::string& player) const;
   bool isDraw() const;
+  bool isOver() const { return isWin("X") || isWin("O") || isDraw(); }
   std::string turn() const { return _turn; }
   std::vector<int> possibleActions() const;
   void act(const Action& action);
