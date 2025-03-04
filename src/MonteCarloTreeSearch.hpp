@@ -4,8 +4,8 @@
 #include <sstream>
 #include <vector>
 
-#include "Game.h"
 #include "MonteCarloTreeSearch.h"
+#include "concepts.h"
 
 template <IsGame Game>
 Game::Action MonteCarloTreeSearch<Game>::findNextMove(const Game& game) const {

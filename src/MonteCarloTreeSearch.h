@@ -6,8 +6,8 @@
 #include <string>  // Include the string header
 #include <vector>
 
-#include "Game.h"
 #include "TreeNode.h"
+#include "concepts.h"
 
 template <IsGame Game>
 class MonteCarloTreeSearch {

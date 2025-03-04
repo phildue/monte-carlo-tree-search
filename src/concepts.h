@@ -14,3 +14,9 @@ concept IsGame =
       } -> std::convertible_to<std::vector<typename T::Action>>;
       { game.act(action) } -> std::same_as<void>;
     };
+
+template <typename T, typename Game>
+concept IsPlayerAlgorithm =
+    IsGame<Game> && requires(T algorithm, const Game& game) {
+      { algorithm.findNextMove(game) } -> std::same_as<typename Game::Action>;
+    };

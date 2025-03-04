@@ -1,4 +1,4 @@
-*.png
+
 *.dot
 # CMake generated files
 CMakeFiles/

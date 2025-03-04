@@ -22,6 +22,12 @@ Monte Carlo Tree Search (MCTS) is a heuristic search algorithm used for decision
 
 MCTS is particularly effective for games with large state spaces and has been successfully applied to various games, including Go, Chess, and Tic Tac Toe.
 
+
+Below is a visualization of the Monte Carlo Tree showing different options and their impact:
+
+![MCTS Tree](doc/tree.png)
+
+
 ## C++ Implementation
 
 In this implementation we try to apply modern C++ language features e.g. concepts.
@@ -49,9 +55,9 @@ make
 After building the project, you can run the executable:
 
 ```sh
-./tic_tac_toe
+./tic_tac_toe -X human -O ai -i 100
 ```
-
+Where the larger i, the higher the difficulty, set -d to draw intermediate mcts trees (only applicable with ai players).
 ## Usage
 
 Follow the on-screen instructions to play Tic Tac Toe against the AI powered by the MCTS algorithm.

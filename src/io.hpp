@@ -36,9 +36,11 @@ void toDotFile(const std::string& filename,
           return;
         }
         auto children = node->children();
+        const double scoreF = node->data().game.turn() == player ? 1.0 : -1.0;
         auto maxChild = std::max_element(
-            children.begin(), children.end(),
-            [](auto a, auto b) { return a->data().score < b->data().score; });
+            children.begin(), children.end(), [scoreF](auto a, auto b) {
+              return scoreF * a->data().score < scoreF * b->data().score;
+            });
 
         for (const auto& child : children) {
           file << "  \"" << node.get() << "\" -> \"" << child.get() << "\";\n";

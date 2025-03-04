@@ -6,17 +6,28 @@
 #include <memory>
 #include <variant>
 
+#include "MonteCarloTreeSearch.h"
 #include "Player.h"
 #include "TicTacToe.h"
 #include "io.h"
+
 std::shared_ptr<Player<TicTacToe>> createPlayer(const std::string& type,
                                                 const std::string& symbol,
-                                                int iterations) {
+                                                int iterations,
+                                                bool useDrawingMCTS) {
   const std::string opponent = symbol == "X" ? "O" : "X";
   if (type == "ai") {
-    return std::make_shared<AIPlayer<TicTacToe>>(
-        symbol, std::make_shared<MonteCarloTreeSearch<TicTacToe>>(
-                    symbol, opponent, iterations));
+    if (useDrawingMCTS) {
+      return std::make_shared<
+          AIPlayer<TicTacToe, DrawingMonteCarloTreeSearch<TicTacToe>>>(
+          symbol,
+          DrawingMonteCarloTreeSearch<TicTacToe>{symbol, opponent, iterations});
+    } else {
+      return std::make_shared<
+          AIPlayer<TicTacToe, MonteCarloTreeSearch<TicTacToe>>>(
+          symbol,
+          MonteCarloTreeSearch<TicTacToe>{symbol, opponent, iterations});
+    }
   } else if (type == "human") {
     return std::make_shared<HumanPlayer<TicTacToe>>(symbol);
   } else if (type == "random") {
@@ -30,9 +41,10 @@ int main(int argc, char* argv[]) {
   std::string playerXType = "ai";
   std::string playerOType = "ai";
   int iterations = 250;
+  bool useDrawingMCTS = false;
 
   int opt;
-  while ((opt = getopt(argc, argv, "X:O:i:")) != -1) {
+  while ((opt = getopt(argc, argv, "X:O:i:d")) != -1) {
     switch (opt) {
       case 'X':
         playerXType = optarg;
@@ -43,9 +55,12 @@ int main(int argc, char* argv[]) {
       case 'i':
         iterations = std::stoi(optarg);
         break;
+      case 'd':
+        useDrawingMCTS = true;
+        break;
       default:
         std::cerr << "Usage: " << argv[0]
-                  << " [-X playerXType] [-O playerOType] [-i iterations]"
+                  << " [-X playerXType] [-O playerOType] [-i iterations] [-d]"
                   << std::endl;
         return 1;
     }
@@ -54,9 +69,9 @@ int main(int argc, char* argv[]) {
   TicTacToe game{};
   std::cout << "Tic Tac Toe Game" << std::endl;
 
-  std::map<std::string, Player<TicTacToe>::ShConstPtr> players = {
-      {"O", createPlayer(playerOType, "O", iterations)},
-      {"X", createPlayer(playerXType, "X", iterations)}};
+  std::map<std::string, Player<TicTacToe>::ShPtr> players = {
+      {"O", createPlayer(playerOType, "O", iterations, useDrawingMCTS)},
+      {"X", createPlayer(playerXType, "X", iterations, useDrawingMCTS)}};
 
   while (!game.isWin("X") && !game.isWin("O") && !game.isDraw()) {
     std::cout << game.str() << std::endl;
