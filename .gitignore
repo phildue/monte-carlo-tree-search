@@ -1,3 +1,5 @@
+*.png
+*.dot
 # CMake generated files
 CMakeFiles/
 CMakeCache.txt

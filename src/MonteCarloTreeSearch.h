@@ -40,10 +40,6 @@ class MonteCarloTreeSearch {
   float simulate(Node::ShConstPtr node) const;
   void backpropagate(Node::ShPtr node, float result) const;
 
-  std::string nodeToStr(Node::ShConstPtr node) const;
-  void drawTree(const std::string& filename,
-                typename Node::ShConstPtr root) const;
-
  private:
   std::string _player, _opponent;
   int _maxIterations;

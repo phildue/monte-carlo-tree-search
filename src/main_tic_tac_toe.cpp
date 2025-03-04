@@ -8,7 +8,7 @@
 
 #include "Player.h"
 #include "TicTacToe.h"
-
+#include "io.h"
 std::shared_ptr<Player<TicTacToe>> createPlayer(const std::string& type,
                                                 const std::string& symbol,
                                                 int iterations) {
@@ -29,7 +29,7 @@ std::shared_ptr<Player<TicTacToe>> createPlayer(const std::string& type,
 int main(int argc, char* argv[]) {
   std::string playerXType = "ai";
   std::string playerOType = "ai";
-  int iterations = 100000;
+  int iterations = 250;
 
   int opt;
   while ((opt = getopt(argc, argv, "X:O:i:")) != -1) {

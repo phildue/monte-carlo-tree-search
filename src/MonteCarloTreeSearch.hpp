@@ -1,8 +1,5 @@
 #pragma once
 #include <algorithm>
-#include <fstream>
-#include <functional>
-#include <iostream>
 #include <memory>
 #include <sstream>
 #include <vector>
@@ -125,66 +122,4 @@ void MonteCarloTreeSearch<Game>::backpropagate(
     n->data().score = n->data().totalReward / n->data().nVisits;
     n = n->parent();
   } while (n);
-}
-
-template <IsGame Game>
-std::string MonteCarloTreeSearch<Game>::nodeToStr(
-    typename MonteCarloTreeSearch<Game>::Node::ShConstPtr node) const {
-  std::stringstream ss;
-  for (int i = 0; i < 9; ++i) {
-    const auto& children = node->children();
-    auto action = std::find_if(children.begin(), children.end(),
-                               [i](auto n) { return n->data().action == i; });
-    if (action == children.end()) {
-      ss << "...... ";
-    } else {
-      auto data = (*action)->data();
-      ss << data.totalReward << "|" << data.nVisits << " ";
-    }
-    if (i % 3 == 2) {
-      ss << "\n";
-    }
-  }
-  return ss.str();
-}
-template <IsGame Game>
-void MonteCarloTreeSearch<Game>::drawTree(
-    const std::string& filename, typename Node::ShConstPtr root) const {
-  std::ofstream file(filename);
-  file << "digraph G {\n";
-  std::function<void(typename Node::ShConstPtr, int)> drawNode =
-      [&](typename Node::ShConstPtr node, int thickness) {
-        std::string color;
-        auto otherPlayer = _player == "X" ? "O" : "X";
-        if (node->data().game.isWin(_player)) {
-          color = "green";
-        } else if (node->data().game.isWin(otherPlayer)) {
-          color = "red";
-        } else if (node->data().game.isDraw()) {
-          color = "yellow";
-        } else {
-          color = "white";
-        }
-        file << "  \"" << node.get() << "\" [label=\""
-             << node->data().game.str() << "Visits: " << node->data().nVisits
-             << "\\nReward: " << node->data().score
-             << "\", style=filled, fillcolor=" << color
-             << ", penwidth=" << thickness << "];\n";
-
-        if (node->children().empty()) {
-          return;
-        }
-        auto children = node->children();
-        auto maxChild = std::max_element(
-            children.begin(), children.end(),
-            [](auto a, auto b) { return a->data().score < b->data().score; });
-
-        for (const auto& child : children) {
-          file << "  \"" << node.get() << "\" -> \"" << child.get() << "\";\n";
-          drawNode(child, child == *maxChild ? 3 : 1);
-        }
-      };
-  drawNode(root, 1);
-  file << "}\n";
-  file.close();
 }

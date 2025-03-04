@@ -41,9 +41,7 @@ class AIPlayer : public Player<Game> {
            std::shared_ptr<const MonteCarloTreeSearch<Game>> mcts)
       : _player(player), _mcts(mcts) {}
   Game::Action getAction(const Game& game) const override {
-    auto tree = _mcts->buildTree(game);
-    _mcts->drawTree("tree_" + _player + ".dot", tree);
-    auto move = _mcts->selectBestAction(tree);
+    auto move = _mcts->findNextMove(game);
     std::cout << "[" << _player << "] AI move: " << move << std::endl;
     return move;
   }
